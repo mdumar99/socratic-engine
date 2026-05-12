@@ -35,7 +35,7 @@ using ResultCallback = std::function<void(AgentResult)>;
  * This is the core of the Socratic debate — each agent has
  * a distinct persona and instruction set.
  */
-inline std::string build_system_prompt(AgentRole role, uint8_t round) {
+inline std::string build_system_prompt(AgentRole role, uint8_t /*round*/) {
     switch (role) {
         case AgentRole::Proposer:
             return "You are the Proposer agent in a Socratic reasoning system. "

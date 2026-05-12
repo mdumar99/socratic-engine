@@ -1,3 +1,4 @@
+#include "../knowledge_graph/kg_types.hpp"
 #include "agent_runner.hpp"
 #include "../dispatcher/dispatcher.hpp"
 #include "../knowledge_graph/knowledge_graph.hpp"
