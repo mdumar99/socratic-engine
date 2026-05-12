@@ -52,3 +52,9 @@ source python/venv/bin/activate
 
 ## Phase 5 — Docker
 Enable WSL2 integration in Docker Desktop settings.
+
+## Verified working
+- faiss 1.13.2
+- huggingface-hub 1.14.0  
+- networkx 3.6.1
+- Python venv isolated at python/venv/ (not system Python)
