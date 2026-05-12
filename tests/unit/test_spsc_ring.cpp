@@ -14,7 +14,7 @@ void test_basic_push_pop() {
     assert(ring.push(42));
     assert(!ring.empty());
 
-    auto val = ring.pop();
+    [[maybe_unused]] auto val = ring.pop();
     assert(val.has_value());
     assert(val.value() == 42);
     assert(ring.empty());
@@ -38,7 +38,7 @@ void test_fifo_order() {
 
     for (int i = 0; i < 10; i++) ring.push(i);
     for (int i = 0; i < 10; i++) {
-        auto val = ring.pop();
+        [[maybe_unused]] auto val = ring.pop();
         assert(val.has_value());
         assert(val.value() == i);
     }
@@ -62,7 +62,7 @@ void test_concurrent_producer_consumer() {
     std::thread consumer([&]() {
         int count = 0;
         while (count < N) {
-            auto val = ring.pop();
+            [[maybe_unused]] auto val = ring.pop();
             if (val) {
                 sum_consumed.fetch_add(val.value(), std::memory_order_relaxed);
                 count++;
@@ -90,7 +90,7 @@ void test_agent_job_fits_ring() {
     __builtin_memcpy(job.query, q, job.query_len);
 
     assert(ring.push(job));
-    auto out = ring.pop();
+    [[maybe_unused]] auto out = ring.pop();
     assert(out.has_value());
     assert(out->job_id == 1);
     assert(out->role == AgentRole::Proposer);

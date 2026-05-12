@@ -34,10 +34,10 @@ struct TestDB {
 void test_upsert_and_get_node() {
     TestDB db("/tmp/kg_test_1");
 
-    KGNode n = make_node(1, "lightning", "Electrical discharge in atmosphere");
+    [[maybe_unused]] KGNode n = make_node(1, "lightning", "Electrical discharge in atmosphere");
     assert(db.kg.upsert_node(n));
 
-    auto result = db.kg.get_node(1);
+    [[maybe_unused]] auto result = db.kg.get_node(1);
     assert(result.has_value());
     assert(result->id == 1);
     assert(std::string(result->label, result->label_len) == "lightning");
@@ -47,7 +47,7 @@ void test_upsert_and_get_node() {
 
 void test_missing_node_returns_nullopt() {
     TestDB db("/tmp/kg_test_2");
-    auto result = db.kg.get_node(999);
+    [[maybe_unused]] auto result = db.kg.get_node(999);
     assert(!result.has_value());
     std::cout << "✓ test_missing_node_returns_nullopt\n";
 }
