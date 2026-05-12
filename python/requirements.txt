@@ -1,0 +1,15 @@
+# Core
+huggingface-hub>=0.22.0
+numpy>=1.26.0
+
+# Knowledge graph tooling
+networkx>=3.2.0
+
+# Vector similarity
+faiss-cpu>=1.8.0
+
+# Dev / testing
+pytest>=8.0.0
+pytest-cov>=5.0.0
+black>=24.0.0
+ruff>=0.4.0
