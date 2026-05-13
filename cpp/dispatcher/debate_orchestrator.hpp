@@ -46,7 +46,7 @@ public:
         // Pre-create one context per agent — done ONCE at startup
         std::cout << "  Pre-creating 4 agent contexts...\n";
         for (int i = 0; i < 4; ++i) {
-            contexts_[i] = engine_.make_context(2048, 2);
+            contexts_[i] = engine_.make_context(3072, 2);
             std::cout << "  Context " << i << " ready\n";
         }
         std::cout << "  All contexts ready.\n\n";

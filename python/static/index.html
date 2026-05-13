@@ -17,210 +17,159 @@
   }
 
   header {
-    padding: 20px 32px;
+    padding: 18px 32px;
     border-bottom: 1px solid #1e2433;
     display: flex;
     align-items: center;
     gap: 12px;
   }
 
-  header h1 {
-    font-size: 20px;
-    font-weight: 600;
-    color: #f1f5f9;
-    letter-spacing: -0.3px;
-  }
-
-  header span {
-    font-size: 12px;
-    color: #64748b;
-    background: #1e2433;
-    padding: 3px 8px;
-    border-radius: 4px;
+  header h1 { font-size: 20px; font-weight: 600; color: #f1f5f9; }
+  header .tag {
+    font-size: 11px; color: #64748b;
+    background: #1e2433; padding: 3px 8px; border-radius: 4px;
   }
 
   .main {
-    flex: 1;
-    max-width: 860px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 32px 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
+    flex: 1; max-width: 860px; width: 100%;
+    margin: 0 auto; padding: 28px 24px;
+    display: flex; flex-direction: column; gap: 20px;
   }
 
-  .query-box {
-    display: flex;
-    gap: 10px;
-  }
+  .query-box { display: flex; gap: 10px; }
 
   .query-box input {
-    flex: 1;
-    background: #1e2433;
-    border: 1px solid #2d3748;
-    color: #e2e8f0;
-    padding: 12px 16px;
-    border-radius: 8px;
-    font-size: 15px;
-    outline: none;
-    transition: border-color 0.15s;
+    flex: 1; background: #1e2433; border: 1px solid #2d3748;
+    color: #e2e8f0; padding: 12px 16px; border-radius: 8px;
+    font-size: 15px; outline: none; transition: border-color 0.15s;
   }
-
   .query-box input:focus { border-color: #4f6ef7; }
   .query-box input::placeholder { color: #4a5568; }
 
   .query-box button {
-    background: #4f6ef7;
-    color: white;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.15s;
-    white-space: nowrap;
+    background: #4f6ef7; color: white; border: none;
+    padding: 12px 24px; border-radius: 8px; font-size: 15px;
+    font-weight: 500; cursor: pointer; transition: background 0.15s;
   }
-
   .query-box button:hover { background: #3d5ce8; }
   .query-box button:disabled { background: #2d3748; color: #4a5568; cursor: not-allowed; }
 
-  .status {
-    font-size: 13px;
-    color: #64748b;
-    min-height: 20px;
+  .examples { display: flex; flex-wrap: wrap; gap: 8px; }
+  .example-btn {
+    background: #1e2433; border: 1px solid #2d3748; color: #94a3b8;
+    padding: 6px 12px; border-radius: 6px; font-size: 13px;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .example-btn:hover { border-color: #4f6ef7; color: #e2e8f0; }
+
+  .progress {
+    display: none; gap: 8px; align-items: center;
+  }
+  .progress.visible { display: flex; }
+
+  .step {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 12px; color: #4a5568; transition: color 0.2s;
+  }
+  .step.active { color: #e2e8f0; }
+  .step.done   { color: #48bb78; }
+
+  .step-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #2d3748; transition: background 0.2s;
+    flex-shrink: 0;
+  }
+  .step.active .step-dot { background: #4f6ef7; animation: pulse 1s infinite; }
+  .step.done   .step-dot { background: #48bb78; animation: none; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; } 50% { opacity: 0.4; }
   }
 
+  .step-arrow { color: #2d3748; font-size: 11px; }
+
+  .status { font-size: 13px; color: #64748b; min-height: 18px; }
   .status.running { color: #4f6ef7; }
   .status.done    { color: #48bb78; }
   .status.error   { color: #fc8181; }
 
-  .rounds { display: flex; flex-direction: column; gap: 16px; }
+  .rounds { display: flex; flex-direction: column; gap: 14px; }
 
   .round-card {
-    background: #1a1f2e;
-    border: 1px solid #2d3748;
-    border-radius: 10px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease;
+    background: #1a1f2e; border: 1px solid #2d3748;
+    border-radius: 10px; overflow: hidden;
+    animation: fadeIn 0.25s ease;
   }
 
   @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
+    from { opacity: 0; transform: translateY(5px); }
     to   { opacity: 1; transform: translateY(0); }
   }
 
   .round-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 16px;
-    border-bottom: 1px solid #2d3748;
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px; border-bottom: 1px solid #2d3748;
   }
 
-  .round-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+  .badge {
+    font-size: 11px; font-weight: 600; padding: 2px 8px;
+    border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
   }
+  .badge-proposer   { background: #1e3a5f; color: #63b3ed; }
+  .badge-critic     { background: #3d1f1f; color: #fc8181; }
+  .badge-retriever  { background: #1a3d2b; color: #68d391; }
+  .badge-synthesizer{ background: #3d3020; color: #f6ad55; }
 
-  .badge-proposer  { background: #1e3a5f; color: #63b3ed; }
-  .badge-critic    { background: #3d1f1f; color: #fc8181; }
-  .badge-retriever { background: #1a3d2b; color: #68d391; }
-  .badge-synthesizer { background: #3d3020; color: #f6ad55; }
-
-  .round-label {
-    font-size: 13px;
-    color: #64748b;
-  }
+  .round-label { font-size: 12px; color: #4a5568; }
 
   .round-body {
-    padding: 16px;
-    font-size: 14px;
-    line-height: 1.7;
-    color: #cbd5e0;
-    white-space: pre-wrap;
-    word-break: break-word;
+    padding: 14px 16px; font-size: 14px; line-height: 1.75;
+    color: #cbd5e0; white-space: pre-wrap; word-break: break-word;
+    min-height: 24px;
   }
+
+  .cursor {
+    display: inline-block; width: 2px; height: 14px;
+    background: #4f6ef7; margin-left: 1px;
+    animation: blink 0.7s step-end infinite;
+    vertical-align: text-bottom;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
 
   .final-card {
-    background: #1a2a1a;
-    border: 1px solid #2d5a2d;
-    border-radius: 10px;
-    overflow: hidden;
-    animation: fadeIn 0.3s ease;
+    background: #0f1f0f; border: 1px solid #2d5a2d;
+    border-radius: 10px; overflow: hidden;
+    animation: fadeIn 0.25s ease;
   }
-
   .final-header {
-    padding: 12px 16px;
-    border-bottom: 1px solid #2d5a2d;
-    font-size: 13px;
-    font-weight: 600;
-    color: #68d391;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    padding: 10px 14px; border-bottom: 1px solid #2d5a2d;
+    font-size: 12px; font-weight: 600; color: #68d391;
+    text-transform: uppercase; letter-spacing: 0.5px;
   }
-
   .final-body {
-    padding: 16px;
-    font-size: 15px;
-    line-height: 1.8;
-    color: #e2e8f0;
-    white-space: pre-wrap;
+    padding: 16px; font-size: 15px; line-height: 1.8;
+    color: #e2e8f0; white-space: pre-wrap; min-height: 24px;
   }
 
-  .timing {
-    font-size: 12px;
-    color: #4a5568;
-    text-align: right;
+  .bottom-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: #4a5568;
   }
 
-  .examples {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+  .copy-btn {
+    background: #1e2433; border: 1px solid #2d3748; color: #64748b;
+    padding: 4px 10px; border-radius: 5px; font-size: 12px;
+    cursor: pointer; transition: all 0.15s; display: none;
   }
-
-  .example-btn {
-    background: #1e2433;
-    border: 1px solid #2d3748;
-    color: #94a3b8;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.15s;
-  }
-
-  .example-btn:hover {
-    border-color: #4f6ef7;
-    color: #e2e8f0;
-  }
-
-  .spinner {
-    display: inline-block;
-    width: 12px;
-    height: 12px;
-    border: 2px solid #4f6ef7;
-    border-top-color: transparent;
-    border-radius: 50%;
-    animation: spin 0.7s linear infinite;
-    vertical-align: middle;
-    margin-right: 6px;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .copy-btn.visible { display: inline-block; }
+  .copy-btn:hover { border-color: #4f6ef7; color: #e2e8f0; }
 </style>
 </head>
 <body>
 
 <header>
   <h1>Socratic Engine</h1>
-  <span>Phi-3 mini · 4-round debate · local GPU</span>
+  <span class="tag">Phi-3 mini · 4-round debate · local GPU</span>
 </header>
 
 <div class="main">
@@ -237,109 +186,204 @@
     <button class="example-btn" onclick="setQuery('What is a black hole?')">What is a black hole?</button>
   </div>
 
+  <!-- Round progress indicator -->
+  <div class="progress" id="progress">
+    <div class="step" id="step-0">
+      <div class="step-dot"></div><span>Proposer</span>
+    </div>
+    <span class="step-arrow">›</span>
+    <div class="step" id="step-1">
+      <div class="step-dot"></div><span>Critic</span>
+    </div>
+    <span class="step-arrow">›</span>
+    <div class="step" id="step-2">
+      <div class="step-dot"></div><span>Retriever</span>
+    </div>
+    <span class="step-arrow">›</span>
+    <div class="step" id="step-3">
+      <div class="step-dot"></div><span>Synthesizer</span>
+    </div>
+  </div>
+
   <div class="status" id="status"></div>
   <div class="rounds" id="rounds"></div>
+
+  <div class="bottom-bar">
+    <div class="status" id="timing"></div>
+    <button class="copy-btn" id="copyBtn" onclick="copyAnswer()">Copy final answer</button>
+  </div>
 
 </div>
 
 <script>
 const WS_URL = `ws://${location.host}/ws/debate`;
-const ARTIFACTS = ['<|end|>', '<|assistant|>', '<|user|>', '<|system|>', '<s>', '</s>'];
+const ARTIFACTS = ['<|end|>','<|assistant|>','<|user|>','<|system|>','<s>','</s>'];
 
 let ws = null;
 let startTime = null;
+let finalAnswer = '';
+let activeBodyEl = null;
+let cursorEl = null;
+
+const ROLES = ['Proposer','Critic','Retriever','Synthesizer'];
+const ROLE_CLASS = {
+  Proposer:'proposer', Critic:'critic',
+  Retriever:'retriever', Synthesizer:'synthesizer'
+};
+const ROUND_LABELS = ['Round 0','Round 1','Round 2','Round 3'];
 
 function setQuery(q) {
   document.getElementById('queryInput').value = q;
   document.getElementById('queryInput').focus();
 }
 
-function strip(text) {
-  ARTIFACTS.forEach(a => { text = text.split(a).join(''); });
-  return text.trim();
-}
-
-function setStatus(msg, cls = '') {
+function setStatus(msg, cls='') {
   const el = document.getElementById('status');
-  el.textContent = msg;
+  el.innerHTML = msg;
   el.className = 'status ' + cls;
 }
 
-function addRound(round, role, output) {
-  const roleKey = role.toLowerCase();
-  const labels = {0:'Round 0', 1:'Round 1', 2:'Round 2', 3:'Round 3'};
+function setStep(round, state) {
+  const el = document.getElementById('step-' + round);
+  if (el) { el.className = 'step ' + state; }
+}
 
-  if (role === 'Synthesizer') {
-    const card = document.createElement('div');
-    card.className = 'final-card';
+function createRoundCard(round, role) {
+  const isFinal = role === 'Synthesizer';
+  const card = document.createElement('div');
+  card.className = isFinal ? 'final-card' : 'round-card';
+  card.id = 'card-' + round;
+
+  if (isFinal) {
     card.innerHTML = `
       <div class="final-header">✦ Final Answer</div>
-      <div class="final-body">${strip(output)}</div>
+      <div class="final-body" id="body-${round}"></div>
     `;
-    document.getElementById('rounds').appendChild(card);
-    return;
+  } else {
+    card.innerHTML = `
+      <div class="round-header">
+        <span class="badge badge-${ROLE_CLASS[role]}">${role}</span>
+        <span class="round-label">${ROUND_LABELS[round]}</span>
+      </div>
+      <div class="round-body" id="body-${round}"></div>
+    `;
   }
 
-  const card = document.createElement('div');
-  card.className = 'round-card';
-  card.innerHTML = `
-    <div class="round-header">
-      <span class="round-badge badge-${roleKey}">${role}</span>
-      <span class="round-label">${labels[round]}</span>
-    </div>
-    <div class="round-body">${strip(output)}</div>
-  `;
   document.getElementById('rounds').appendChild(card);
+  return document.getElementById('body-' + round);
+}
+
+function addCursor(el) {
+  removeCursor();
+  cursorEl = document.createElement('span');
+  cursorEl.className = 'cursor';
+  el.appendChild(cursorEl);
+  activeBodyEl = el;
+}
+
+function removeCursor() {
+  if (cursorEl) { cursorEl.remove(); cursorEl = null; }
+  activeBodyEl = null;
+}
+
+function appendToken(bodyEl, token) {
+  // Strip artifacts from token
+  let t = token;
+  ARTIFACTS.forEach(a => { t = t.split(a).join(''); });
+  if (!t) return;
+
+  // Insert text before cursor
+  if (cursorEl) {
+    bodyEl.insertBefore(document.createTextNode(t), cursorEl);
+  } else {
+    bodyEl.appendChild(document.createTextNode(t));
+  }
+
+  // Auto-scroll
+  bodyEl.scrollIntoView({ block: 'nearest' });
 }
 
 function startDebate() {
   const query = document.getElementById('queryInput').value.trim();
   if (!query) return;
 
-  // Clear previous
+  // Reset
   document.getElementById('rounds').innerHTML = '';
-  setStatus('<span class="spinner"></span> Connecting…', 'running');
-  document.getElementById('askBtn').disabled = true;
+  document.getElementById('copyBtn').classList.remove('visible');
+  document.getElementById('timing').textContent = '';
+  document.getElementById('progress').classList.add('visible');
+  ROLES.forEach((_, i) => setStep(i, ''));
+  finalAnswer = '';
   startTime = Date.now();
 
-  if (ws) { ws.close(); ws = null; }
+  setStatus('Connecting…', 'running');
+  document.getElementById('askBtn').disabled = true;
 
+  if (ws) { ws.close(); ws = null; }
   ws = new WebSocket(WS_URL);
 
   ws.onopen = () => {
-    setStatus('<span class="spinner"></span> Debate in progress…', 'running');
-    ws.send(JSON.stringify({ query, tokens: 250 }));
+    setStatus('Starting debate…', 'running');
+    ws.send(JSON.stringify({ query, tokens: 400 }));
   };
 
-  ws.onmessage = (e) => {
-    const event = JSON.parse(e.data);
+  let currentBodyEl = null;
 
-    if (event.event === 'start') {
-      setStatus(`<span class="spinner"></span> Running debate · KG: ${event.kg_nodes} node(s)`, 'running');
+  ws.onmessage = (e) => {
+    const ev = JSON.parse(e.data);
+
+    if (ev.event === 'start') {
+      setStatus(`Debate running · KG: ${ev.kg_nodes} node(s)`, 'running');
     }
-    else if (event.event === 'round') {
-      addRound(event.round, event.role, event.output);
-      setStatus(`<span class="spinner"></span> ${event.role} done · waiting for next round…`, 'running');
+    else if (ev.event === 'round_start') {
+      setStep(ev.round, 'active');
+      setStatus(`${ev.role} thinking…`, 'running');
+      currentBodyEl = createRoundCard(ev.round, ev.role);
+      addCursor(currentBodyEl);
     }
-    else if (event.event === 'done') {
+    else if (ev.event === 'token') {
+      if (currentBodyEl) appendToken(currentBodyEl, ev.token);
+    }
+    else if (ev.event === 'round_end') {
+      removeCursor();
+      setStep(ev.round, 'done');
+      if (ev.role === 'Synthesizer') {
+        finalAnswer = currentBodyEl ? currentBodyEl.textContent : '';
+        document.getElementById('copyBtn').classList.add('visible');
+      }
+      currentBodyEl = null;
+    }
+    else if (ev.event === 'done') {
       const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
-      setStatus(`✓ Complete in ${elapsed}s`, 'done');
+      setStatus('', '');
+      document.getElementById('timing').textContent = `✓ Complete in ${elapsed}s`;
       document.getElementById('askBtn').disabled = false;
     }
-    else if (event.event === 'error') {
-      setStatus(`✗ Error: ${event.message}`, 'error');
+    else if (ev.event === 'error') {
+      removeCursor();
+      setStatus(`Error: ${ev.message}`, 'error');
       document.getElementById('askBtn').disabled = false;
     }
   };
 
   ws.onerror = () => {
-    setStatus('✗ WebSocket error — is the server running?', 'error');
+    setStatus('WebSocket error — is the server running?', 'error');
     document.getElementById('askBtn').disabled = false;
   };
 
   ws.onclose = () => {
+    removeCursor();
     document.getElementById('askBtn').disabled = false;
   };
+}
+
+function copyAnswer() {
+  if (!finalAnswer) return;
+  navigator.clipboard.writeText(finalAnswer).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy final answer'; }, 2000);
+  });
 }
 
 document.getElementById('queryInput').addEventListener('keydown', e => {

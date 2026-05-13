@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 """
-Socratic Engine — FastAPI server
-Streams debate rounds to the browser via WebSocket.
+Socratic Engine — FastAPI server with token streaming
 """
-
 import asyncio
 import json
 import os
@@ -19,10 +17,10 @@ BINARY = PROJECT_ROOT / "build/cpp/dispatcher/debate_runner"
 LLAMA_LIBS = Path.home() / "llama.cpp/build/bin"
 STATIC_DIR = Path(__file__).parent / "static"
 
-app = FastAPI(title="Socratic Engine", version="0.1.0")
+app = FastAPI(title="Socratic Engine", version="0.2.0")
 
 
-async def stream_debate(query: str, tokens: int = 250) -> AsyncIterator[dict]:
+async def stream_debate(query: str, tokens: int = 400) -> AsyncIterator[dict]:
     """Run debate_runner and yield parsed JSON events as they arrive."""
     env = os.environ.copy()
     env["LD_LIBRARY_PATH"] = str(LLAMA_LIBS)
@@ -54,10 +52,9 @@ async def debate_websocket(websocket: WebSocket):
     await websocket.accept()
 
     try:
-        # Receive query from client
         data = await websocket.receive_json()
         query = data.get("query", "").strip()
-        tokens = int(data.get("tokens", 150))
+        tokens = int(data.get("tokens", 250))
 
         if not query:
             await websocket.send_json({"event": "error", "message": "Empty query"})
@@ -69,7 +66,6 @@ async def debate_websocket(websocket: WebSocket):
             )
             return
 
-        # Stream events to client as they arrive
         async for event in stream_debate(query, tokens):
             await websocket.send_json(event)
 
@@ -99,6 +95,5 @@ async def root():
     return HTMLResponse("<h1>Socratic Engine API</h1><p>UI not built yet.</p>")
 
 
-# Mount static files if directory exists
 if STATIC_DIR.exists():
     app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
