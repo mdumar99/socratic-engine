@@ -17,9 +17,11 @@ any single model call could.
 **Round 3 — Synthesizer**: merges all three into a final, refined answer  
 
 ## Architecture
+
+```text
 User query
-│
-▼
+    │
+    ▼
 Debate Orchestrator
 │
 ├── Round 0 ──▶ Proposer    (Phi-3 mini, CUDA) ──▶ hypothesis
@@ -36,11 +38,16 @@ C++ Dispatcher ←──── Knowledge Graph (RocksDB + BFS, < 2ms)
 │
 └── Lock-free SPSC ring buffers (one per agent)
 Zero mutex overhead, cache-line aligned
+```
+
 ## Web UI
+
+```text
 Browser  ──WebSocket──▶  FastAPI server  ──subprocess──▶  debate_runner (C++)
 │
 token events stream
 back as generated
+```
 
 Ask a question, watch 4 agents debate live — tokens appear as they are generated.
 
@@ -68,6 +75,8 @@ Ask a question, watch 4 agents debate live — tokens appear as they are generat
 | Python tooling | huggingface-hub, faiss-cpu, pytest, black |
 
 ## Project structure
+
+```text
 socratic-engine/
 ├── cpp/
 │   ├── ipc/               # Lock-free SPSC ring buffer + AgentJob
@@ -82,7 +91,7 @@ socratic-engine/
 ├── tests/unit/            # C++ unit tests (cmake + ctest)
 ├── docs/                  # Setup guide + architecture decisions
 └── scripts/               # bootstrap.sh, dev helpers
-
+```
 ## Running
 
 **Web UI:**
@@ -101,7 +110,7 @@ python python/cli.py --interactive
 
 ## Setup
 
-See [`docs/setup.md`](docs/setup.md)
+See [docs/setup.md](docs/setup.md)
 
 ## Branch strategy
 
