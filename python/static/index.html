@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Socratic Engine</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0f1117;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  header {
+    padding: 20px 32px;
+    border-bottom: 1px solid #1e2433;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #f1f5f9;
+    letter-spacing: -0.3px;
+  }
+
+  header span {
+    font-size: 12px;
+    color: #64748b;
+    background: #1e2433;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .main {
+    flex: 1;
+    max-width: 860px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  .query-box {
+    display: flex;
+    gap: 10px;
+  }
+
+  .query-box input {
+    flex: 1;
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    color: #e2e8f0;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .query-box input:focus { border-color: #4f6ef7; }
+  .query-box input::placeholder { color: #4a5568; }
+
+  .query-box button {
+    background: #4f6ef7;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s;
+    white-space: nowrap;
+  }
+
+  .query-box button:hover { background: #3d5ce8; }
+  .query-box button:disabled { background: #2d3748; color: #4a5568; cursor: not-allowed; }
+
+  .status {
+    font-size: 13px;
+    color: #64748b;
+    min-height: 20px;
+  }
+
+  .status.running { color: #4f6ef7; }
+  .status.done    { color: #48bb78; }
+  .status.error   { color: #fc8181; }
+
+  .rounds { display: flex; flex-direction: column; gap: 16px; }
+
+  .round-card {
+    background: #1a1f2e;
+    border: 1px solid #2d3748;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .round-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    border-bottom: 1px solid #2d3748;
+  }
+
+  .round-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .badge-proposer  { background: #1e3a5f; color: #63b3ed; }
+  .badge-critic    { background: #3d1f1f; color: #fc8181; }
+  .badge-retriever { background: #1a3d2b; color: #68d391; }
+  .badge-synthesizer { background: #3d3020; color: #f6ad55; }
+
+  .round-label {
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .round-body {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 1.7;
+    color: #cbd5e0;
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .final-card {
+    background: #1a2a1a;
+    border: 1px solid #2d5a2d;
+    border-radius: 10px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .final-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #2d5a2d;
+    font-size: 13px;
+    font-weight: 600;
+    color: #68d391;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .final-body {
+    padding: 16px;
+    font-size: 15px;
+    line-height: 1.8;
+    color: #e2e8f0;
+    white-space: pre-wrap;
+  }
+
+  .timing {
+    font-size: 12px;
+    color: #4a5568;
+    text-align: right;
+  }
+
+  .examples {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .example-btn {
+    background: #1e2433;
+    border: 1px solid #2d3748;
+    color: #94a3b8;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .example-btn:hover {
+    border-color: #4f6ef7;
+    color: #e2e8f0;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    border: 2px solid #4f6ef7;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle;
+    margin-right: 6px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Socratic Engine</h1>
+  <span>Phi-3 mini · 4-round debate · local GPU</span>
+</header>
+
+<div class="main">
+
+  <div class="query-box">
+    <input type="text" id="queryInput" placeholder="Ask anything…" />
+    <button id="askBtn" onclick="startDebate()">Ask</button>
+  </div>
+
+  <div class="examples">
+    <button class="example-btn" onclick="setQuery('What causes lightning?')">What causes lightning?</button>
+    <button class="example-btn" onclick="setQuery('How does photosynthesis work?')">How does photosynthesis work?</button>
+    <button class="example-btn" onclick="setQuery('Why is the sky blue?')">Why is the sky blue?</button>
+    <button class="example-btn" onclick="setQuery('What is a black hole?')">What is a black hole?</button>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="rounds" id="rounds"></div>
+
+</div>
+
+<script>
+const WS_URL = `ws://${location.host}/ws/debate`;
+const ARTIFACTS = ['<|end|>', '<|assistant|>', '<|user|>', '<|system|>', '<s>', '</s>'];
+
+let ws = null;
+let startTime = null;
+
+function setQuery(q) {
+  document.getElementById('queryInput').value = q;
+  document.getElementById('queryInput').focus();
+}
+
+function strip(text) {
+  ARTIFACTS.forEach(a => { text = text.split(a).join(''); });
+  return text.trim();
+}
+
+function setStatus(msg, cls = '') {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status ' + cls;
+}
+
+function addRound(round, role, output) {
+  const roleKey = role.toLowerCase();
+  const labels = {0:'Round 0', 1:'Round 1', 2:'Round 2', 3:'Round 3'};
+
+  if (role === 'Synthesizer') {
+    const card = document.createElement('div');
+    card.className = 'final-card';
+    card.innerHTML = `
+      <div class="final-header">✦ Final Answer</div>
+      <div class="final-body">${strip(output)}</div>
+    `;
+    document.getElementById('rounds').appendChild(card);
+    return;
+  }
+
+  const card = document.createElement('div');
+  card.className = 'round-card';
+  card.innerHTML = `
+    <div class="round-header">
+      <span class="round-badge badge-${roleKey}">${role}</span>
+      <span class="round-label">${labels[round]}</span>
+    </div>
+    <div class="round-body">${strip(output)}</div>
+  `;
+  document.getElementById('rounds').appendChild(card);
+}
+
+function startDebate() {
+  const query = document.getElementById('queryInput').value.trim();
+  if (!query) return;
+
+  // Clear previous
+  document.getElementById('rounds').innerHTML = '';
+  setStatus('<span class="spinner"></span> Connecting…', 'running');
+  document.getElementById('askBtn').disabled = true;
+  startTime = Date.now();
+
+  if (ws) { ws.close(); ws = null; }
+
+  ws = new WebSocket(WS_URL);
+
+  ws.onopen = () => {
+    setStatus('<span class="spinner"></span> Debate in progress…', 'running');
+    ws.send(JSON.stringify({ query, tokens: 250 }));
+  };
+
+  ws.onmessage = (e) => {
+    const event = JSON.parse(e.data);
+
+    if (event.event === 'start') {
+      setStatus(`<span class="spinner"></span> Running debate · KG: ${event.kg_nodes} node(s)`, 'running');
+    }
+    else if (event.event === 'round') {
+      addRound(event.round, event.role, event.output);
+      setStatus(`<span class="spinner"></span> ${event.role} done · waiting for next round…`, 'running');
+    }
+    else if (event.event === 'done') {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      setStatus(`✓ Complete in ${elapsed}s`, 'done');
+      document.getElementById('askBtn').disabled = false;
+    }
+    else if (event.event === 'error') {
+      setStatus(`✗ Error: ${event.message}`, 'error');
+      document.getElementById('askBtn').disabled = false;
+    }
+  };
+
+  ws.onerror = () => {
+    setStatus('✗ WebSocket error — is the server running?', 'error');
+    document.getElementById('askBtn').disabled = false;
+  };
+
+  ws.onclose = () => {
+    document.getElementById('askBtn').disabled = false;
+  };
+}
+
+document.getElementById('queryInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') startDebate();
+});
+</script>
+
+</body>
+</html>
