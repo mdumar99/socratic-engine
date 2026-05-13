@@ -3,10 +3,10 @@
 Socratic Engine — FastAPI server
 Streams debate rounds to the browser via WebSocket.
 """
+
 import asyncio
 import json
 import os
-import subprocess
 from pathlib import Path
 from typing import AsyncIterator
 
