@@ -23,33 +23,26 @@ User query
     │
     ▼
 Debate Orchestrator
-    │
-    ├── Round 0 ──▶ Proposer    (Phi-3 mini, CUDA) ──▶ hypothesis
-    ├── Round 1 ──▶ Critic      (Phi-3 mini, CUDA) ──▶ critique
-    ├── Round 2 ──▶ Retriever   (Phi-3 mini, CUDA) ──▶ evidence
-    └── Round 3 ──▶ Synthesizer (Phi-3 mini, CUDA) ──▶ final answer
-                         │
-                         ▼
-                   merged answer
-                   (streamed live to browser via WebSocket)
-
+│
+├── Round 0 ──▶ Proposer    (Phi-3 mini, CUDA) ──▶ hypothesis
+├── Round 1 ──▶ Critic      (Phi-3 mini, CUDA) ──▶ critique
+├── Round 2 ──▶ Retriever   (Phi-3 mini, CUDA) ──▶ evidence
+└── Round 3 ──▶ Synthesizer (Phi-3 mini, CUDA) ──▶ final answer
+│
+▼
+merged answer
+(streamed live to browser via WebSocket)
 All agents share one loaded model (llama.cpp C API)
 Each agent has its own llama_context — no VRAM duplication
-
 C++ Dispatcher ←──── Knowledge Graph (RocksDB + BFS, < 2ms)
-    │
-    └── Lock-free SPSC ring buffers (one per agent)
-        Zero mutex overhead, cache-line aligned
-```
-
+│
+└── Lock-free SPSC ring buffers (one per agent)
+Zero mutex overhead, cache-line aligned
 ## Web UI
-
-```text
-Browser ──WebSocket──▶ FastAPI server ──subprocess──▶ debate_runner (C++)
-                                                            │
-                                                     token events stream
-                                                     back as generated
-```
+Browser  ──WebSocket──▶  FastAPI server  ──subprocess──▶  debate_runner (C++)
+│
+token events stream
+back as generated
 
 Ask a question, watch 4 agents debate live — tokens appear as they are generated.
 
@@ -93,12 +86,10 @@ socratic-engine/
 ├── tests/unit/            # C++ unit tests (cmake + ctest)
 ├── docs/                  # Setup guide + architecture decisions
 └── scripts/               # bootstrap.sh, dev helpers
-```
 
 ## Running
 
 **Web UI:**
-
 ```bash
 source python/venv/bin/activate
 uvicorn python.server:app --host 0.0.0.0 --port 8000
@@ -106,7 +97,6 @@ uvicorn python.server:app --host 0.0.0.0 --port 8000
 ```
 
 **CLI:**
-
 ```bash
 source python/venv/bin/activate
 python python/cli.py "What causes lightning?"
