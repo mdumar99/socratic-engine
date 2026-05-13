@@ -38,11 +38,16 @@ C++ Dispatcher ←──── Knowledge Graph (RocksDB + BFS, < 2ms)
 │
 └── Lock-free SPSC ring buffers (one per agent)
 Zero mutex overhead, cache-line aligned
+```
+
 ## Web UI
+
+```text
 Browser  ──WebSocket──▶  FastAPI server  ──subprocess──▶  debate_runner (C++)
 │
 token events stream
 back as generated
+```
 
 Ask a question, watch 4 agents debate live — tokens appear as they are generated.
 
@@ -86,7 +91,7 @@ socratic-engine/
 ├── tests/unit/            # C++ unit tests (cmake + ctest)
 ├── docs/                  # Setup guide + architecture decisions
 └── scripts/               # bootstrap.sh, dev helpers
-
+```
 ## Running
 
 **Web UI:**
