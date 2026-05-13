@@ -9,7 +9,6 @@
 #include <thread>
 #include <algorithm>
 #include <filesystem>
-#include <cstring>
 
 using namespace se::agents;
 using namespace se::dispatcher;
@@ -21,63 +20,66 @@ int main() {
 
     std::cout << "=== Socratic Engine Smoke Test ===\n\n";
 
-    // 1. Build a small knowledge graph
+    // 1. Load model ONCE — shared across all agents
+    std::cout << "→ Loading model (one-time)...\n";
+    LlamaEngine engine(MODEL_PATH, 99);
+    std::cout << "  Model loaded.\n\n";
+
+    // 2. Build knowledge graph
     std::cout << "→ Building knowledge graph...\n";
     KnowledgeGraph kg(KG_PATH);
-
     kg.upsert_node(make_node_helper(1, "lightning",
-        "An electrostatic discharge between charged regions of a cloud or between cloud and ground"));
-    kg.upsert_node(make_node_helper(2, "electric charge separation",
-        "Occurs when ice crystals and water droplets collide inside thunderstorm clouds"));
+        "Electrostatic discharge between charged regions of a cloud or ground"));
+    kg.upsert_node(make_node_helper(2, "charge separation",
+        "Ice crystals and water droplets collide inside thunderstorm clouds"));
     kg.upsert_node(make_node_helper(3, "stepped leader",
-        "Invisible channel of ionised air that propagates from cloud toward ground before lightning"));
+        "Invisible ionised air channel propagating from cloud toward ground"));
     kg.upsert_node(make_node_helper(4, "return stroke",
-        "The bright visible flash when current flows up the completed channel at ~1/3 speed of light"));
-
+        "Bright flash when current flows up the completed channel"));
     kg.upsert_edge({1, 2, RelationType::RELATED_TO, 1.0f});
     kg.upsert_edge({1, 3, RelationType::HAS_PROPERTY, 0.9f});
     kg.upsert_edge({3, 4, RelationType::CAUSES, 1.0f});
 
-    // BFS from lightning node, 2 hops
     auto kg_nodes = kg.bfs(1, 2);
     std::string context = kg.to_context_string(kg_nodes);
     std::cout << "  KG context (" << kg_nodes.size() << " nodes):\n" << context << "\n";
 
-    // 2. Set up dispatcher
+    // 3. Dispatcher
     Dispatcher dispatcher;
 
-    // 3. Collect results
+    // 4. Collect results
     std::mutex result_mutex;
     std::vector<AgentResult> results;
+    const char* role_names[] = {"Proposer", "Critic", "Retriever", "Synthesizer"};
 
     auto on_result = [&](AgentResult r) {
         std::lock_guard<std::mutex> lock(result_mutex);
-        const char* role_names[] = {"Proposer", "Critic", "Retriever", "Synthesizer"};
         std::cout << "  [" << role_names[static_cast<int>(r.role)] << "] done\n" << std::flush;
         results.push_back(std::move(r));
     };
 
-    // 4. Start agent runners (one per role)
-    std::cout << "→ Starting 4 agent runners...\n";
+    // 5. Start 4 agents — each gets own context, all share engine
+    std::cout << "→ Starting 4 agents (shared model, 4 contexts)...\n";
     std::vector<std::unique_ptr<AgentRunner>> runners;
     for (uint8_t i = 0; i < static_cast<uint8_t>(AgentRole::COUNT); ++i) {
-        auto role = static_cast<AgentRole>(i);
         runners.push_back(std::make_unique<AgentRunner>(
-            dispatcher.ring_for(role),
-            MODEL_PATH,
-            on_result
+            dispatcher.ring_for(static_cast<AgentRole>(i)),
+            engine,
+            on_result,
+            200,
+            0.7f
         ));
         runners.back()->start();
     }
 
-    // 5. Dispatch query
+    // 6. Dispatch query
     const std::string query = "What causes lightning?";
     std::cout << "→ Dispatching: \"" << query << "\"\n\n";
 
     auto t_start = std::chrono::steady_clock::now();
     dispatcher.dispatch(query, context, 0);
 
-    // 6. Wait for all 4 results (timeout 300s)
+    // 7. Wait for all 4 results (5 minute timeout)
     auto timeout = std::chrono::steady_clock::now() + std::chrono::seconds(300);
     while (std::chrono::steady_clock::now() < timeout) {
         {
@@ -87,27 +89,26 @@ int main() {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
-    auto t_end = std::chrono::steady_clock::now();
-    double elapsed = std::chrono::duration<double>(t_end - t_start).count();
+    auto elapsed = std::chrono::duration<double>(
+        std::chrono::steady_clock::now() - t_start).count();
 
-    // 7. Stop runners
+    // 8. Stop runners
     for (auto& r : runners) r->stop();
 
-    // 8. Print results in role order
-    const char* role_names[] = {"Proposer", "Critic", "Retriever", "Synthesizer"};
-    std::cout << "\n=== Agent outputs ===\n\n";
-
+    // 9. Print results in role order
     std::sort(results.begin(), results.end(),
         [](const AgentResult& a, const AgentResult& b) {
             return static_cast<int>(a.role) < static_cast<int>(b.role);
         });
 
+    std::cout << "\n=== Agent outputs ===\n\n";
     for (const auto& r : results) {
         std::cout << "── " << role_names[static_cast<int>(r.role)] << " ──\n"
-                  << (r.success ? r.output : "[FAILED]") << "\n\n";
+                  << (r.success ? r.output : "[FAILED — empty output]")
+                  << "\n\n";
     }
 
-    std::cout << "=== Total time: " << elapsed << "s ===\n";
+    std::cout << "=== Total wall time: " << elapsed << "s ===\n";
 
     std::filesystem::remove_all(KG_PATH);
     return 0;
