@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <functional>
 #include <vector>
 #include <stdexcept>
 #include <cstring>
@@ -96,6 +97,7 @@ public:
         llama_sampler_chain_add(sampler, llama_sampler_init_temp(temp));
         llama_sampler_chain_add(sampler, llama_sampler_init_dist(42));
 
+        const llama_token eot = llama_vocab_eot(vocab_);
         const llama_token eos = llama_vocab_eos(vocab_);
 
         // Generate tokens
@@ -105,7 +107,7 @@ public:
         for (int i = 0; i < max_tokens; ++i) {
             const llama_token token = llama_sampler_sample(sampler, ctx, -1);
 
-            if (token == eos) break;
+            if (token == eos || token == eot) break;
 
             // Convert token to text
             char buf[256];
@@ -126,6 +128,70 @@ public:
         const auto end   = output.find_last_not_of(" \t\n\r");
         if (start == std::string::npos) return "";
         return output.substr(start, end - start + 1);
+    }
+
+    /**
+     * Streaming version of generate().
+     * Calls token_cb(piece) for each token as it is generated.
+     * Returns false if inference failed.
+     *
+     * @param ctx       Agent context
+     * @param prompt    Full prompt string
+     * @param token_cb  Callback fired per token piece (string_view)
+     * @param max_tokens Max tokens to generate
+     * @param temp      Sampling temperature
+     */
+    bool generate_stream(llama_context* ctx,
+                         const std::string& prompt,
+                         std::function<bool(std::string_view)> token_cb,
+                         int   max_tokens = 256,
+                         float temp       = 0.7f) const
+    {
+        const int n_prompt_tokens = -llama_tokenize(
+            vocab_, prompt.c_str(), static_cast<int32_t>(prompt.size()),
+            nullptr, 0, true, true);
+
+        std::vector<llama_token> tokens(n_prompt_tokens);
+        if (llama_tokenize(vocab_, prompt.c_str(),
+                           static_cast<int32_t>(prompt.size()),
+                           tokens.data(),
+                           static_cast<int32_t>(tokens.size()),
+                           true, true) < 0)
+        {
+            return false;
+        }
+
+        llama_batch batch = llama_batch_get_one(
+            tokens.data(), static_cast<int32_t>(tokens.size()));
+        if (llama_decode(ctx, batch) != 0) return false;
+
+        llama_sampler_chain_params sparams = llama_sampler_chain_default_params();
+        llama_sampler* sampler = llama_sampler_chain_init(sparams);
+        llama_sampler_chain_add(sampler, llama_sampler_init_temp(temp));
+        llama_sampler_chain_add(sampler, llama_sampler_init_dist(42));
+
+        const llama_token eos = llama_vocab_eos(vocab_);
+        const llama_token eot = llama_vocab_eot(vocab_);
+        bool ok = true;
+
+        for (int i = 0; i < max_tokens; ++i) {
+            const llama_token token = llama_sampler_sample(sampler, ctx, -1);
+            if (token == eos || token == eot) break;
+
+            char buf[256];
+            const int n = llama_token_to_piece(vocab_, token, buf, sizeof(buf), 0, true);
+            if (n < 0) { ok = false; break; }
+
+            // Fire callback — if it returns false, caller wants to stop
+            if (!token_cb(std::string_view(buf, n))) break;
+
+            llama_token next_token = token;
+            llama_batch next = llama_batch_get_one(&next_token, 1);
+            if (llama_decode(ctx, next) != 0) { ok = false; break; }
+        }
+
+        llama_sampler_free(sampler);
+        return ok;
     }
 
     const llama_model* model() const { return model_; }
