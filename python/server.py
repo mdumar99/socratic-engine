@@ -2,6 +2,7 @@
 """
 Socratic Engine — FastAPI server with token streaming
 """
+
 import asyncio
 import json
 import os
