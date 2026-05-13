@@ -22,7 +22,7 @@ STATIC_DIR = Path(__file__).parent / "static"
 app = FastAPI(title="Socratic Engine", version="0.1.0")
 
 
-async def stream_debate(query: str, tokens: int = 150) -> AsyncIterator[dict]:
+async def stream_debate(query: str, tokens: int = 250) -> AsyncIterator[dict]:
     """Run debate_runner and yield parsed JSON events as they arrive."""
     env = os.environ.copy()
     env["LD_LIBRARY_PATH"] = str(LLAMA_LIBS)

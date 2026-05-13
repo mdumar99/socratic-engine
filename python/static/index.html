@@ -308,7 +308,7 @@ function startDebate() {
 
   ws.onopen = () => {
     setStatus('<span class="spinner"></span> Debate in progress…', 'running');
-    ws.send(JSON.stringify({ query, tokens: 150 }));
+    ws.send(JSON.stringify({ query, tokens: 250 }));
   };
 
   ws.onmessage = (e) => {
