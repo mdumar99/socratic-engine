@@ -44,7 +44,7 @@ public:
         llama_context_params cparams = llama_context_default_params();
         cparams.n_ctx      = n_ctx;
         cparams.n_threads  = n_threads;
-        cparams.n_batch    = 512;
+        cparams.n_batch    = 2048;
 
         llama_context* ctx = llama_init_from_model(model_, cparams);
         if (!ctx) {
