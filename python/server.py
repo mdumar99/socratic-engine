@@ -4,8 +4,10 @@ Socratic Engine — FastAPI server with token streaming
 """
 
 import asyncio
+import subprocess
 import json
 import os
+import sys
 from pathlib import Path
 from typing import AsyncIterator
 
@@ -82,10 +84,46 @@ async def debate_websocket(websocket: WebSocket):
             pass
 
 
+@app.post("/kg/add")
+async def kg_add(body: dict):
+    """Add text content to the persistent KG."""
+    text = body.get("text", "").strip()
+    label = body.get("label", "text")
+    base_id = int(body.get("base_id", 1000))
+
+    if not text:
+        return {"status": "error", "message": "No text provided"}
+
+    ingest = PROJECT_ROOT / "build/cpp/knowledge_graph/kg_ingest"
+    if not ingest.exists():
+        return {"status": "error", "message": "kg_ingest binary not found"}
+
+    # Use sources to chunk text into nodes
+    sys.path.insert(0, str(PROJECT_ROOT))
+    from python.kg_builder.sources import nodes_from_string
+    from python.kg_builder.builder import KGBuilder
+
+    nodes = nodes_from_string(text, label=label, base_id=base_id)
+    kg = KGBuilder(KG_PATH)
+    written = kg.add_nodes_batch(nodes)
+
+    # Connect new nodes to root node (id=1) so BFS can reach them
+    for node in nodes:
+        kg.add_edge(1, node["id"], relation="RELATED_TO", weight=0.8)
+
+    count = kg.count()
+
+    return {
+        "status": "ok",
+        "nodes_written": written,
+        "total_nodes": count,
+        "kg_path": KG_PATH,
+    }
+
+
 @app.get("/kg/info")
 async def kg_info():
     """Return KG path and node count."""
-    import subprocess
     from pathlib import Path as P
 
     ingest = PROJECT_ROOT / "build/cpp/knowledge_graph/kg_ingest"
