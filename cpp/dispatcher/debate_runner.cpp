@@ -128,17 +128,15 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    bool created_kg = false;
     if (!std::filesystem::exists(kg_path)) {
-        created_kg = true;
         KnowledgeGraph kg_init(kg_path);
         kg_init.upsert_node(make_node_helper(1, "knowledge",
             "General knowledge base — add domain nodes via kg_builder"));
-    }
+    }  // kg_init closes here
 
     try {
         KnowledgeGraph kg(kg_path);
-        auto kg_nodes    = kg.bfs(1, 2, 16);
+        auto kg_nodes    = kg.search_and_bfs(query, 1, 2, 16);
         std::string base = kg.to_context_string(kg_nodes);
 
         emit("{\"event\":\"start\",\"query\":\"" + json_escape(query) +
@@ -206,7 +204,6 @@ int main(int argc, char* argv[]) {
              std::to_string(elapsed) + ",\"success\":true}");
 
         for (int i = 0; i < 4; ++i) llama_free(contexts[i]);
-        if (created_kg) std::filesystem::remove_all(kg_path);
 
     } catch (const std::exception& e) {
         emit_error(e.what());
