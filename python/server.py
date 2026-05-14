@@ -6,7 +6,6 @@ Socratic Engine — FastAPI server with token streaming
 import asyncio
 import json
 import os
-import subprocess
 import sys
 from pathlib import Path
 from typing import AsyncIterator
@@ -124,7 +123,6 @@ async def kg_add(body: dict):
 @app.get("/kg/info")
 async def kg_info():
     """Return KG path and node count."""
-    import subprocess
     from pathlib import Path as P
 
     ingest = PROJECT_ROOT / "build/cpp/knowledge_graph/kg_ingest"
