@@ -142,6 +142,43 @@ public:
         return oss.str();
     }
 
+
+    /**
+     * Search for nodes matching query keywords, then BFS from best match.
+     * Falls back to BFS from seed_id if no match found.
+     */
+    std::vector<KGNode> search_and_bfs(
+        const std::string& query,
+        uint64_t           fallback_seed = 1,
+        int                max_hops      = 2,
+        std::size_t        max_nodes     = 16) const
+    {
+        // Extract first 3 words as search terms
+        std::vector<std::string> terms;
+        std::istringstream iss(query);
+        std::string word;
+        while (iss >> word && terms.size() < 3) {
+            if (word.size() > 3) terms.push_back(word);
+        }
+
+        // Search for each term, pick best matching node as seed
+        uint64_t best_seed = fallback_seed;
+        for (const auto& term : terms) {
+            auto results = search_by_label(term, 3);
+            if (!results.empty()) {
+                best_seed = results[0].id;
+                break;
+            }
+        }
+
+        // BFS from best seed, also include fallback seed nodes
+        auto nodes = bfs(best_seed, max_hops, max_nodes);
+
+        // If we found a topic-specific seed, don't include fallback
+        // If no topic match, return fallback BFS
+        return nodes;
+    }
+
     std::size_t node_count() const {
         uint64_t count = 0;
         auto it = std::unique_ptr<rocksdb::Iterator>(
