@@ -5,7 +5,6 @@ Sources — load text from files, URLs, and plain strings into KG nodes.
 import hashlib
 import re
 from pathlib import Path
-from typing import Iterator
 from urllib.request import urlopen
 from urllib.error import URLError
 

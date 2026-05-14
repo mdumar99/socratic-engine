@@ -5,7 +5,6 @@ KGBuilder — writes nodes and edges to RocksDB via kg_ingest binary.
 import json
 import subprocess
 from pathlib import Path
-from typing import Optional
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 INGEST_BIN = PROJECT_ROOT / "build/cpp/knowledge_graph/kg_ingest"
